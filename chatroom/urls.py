@@ -1,10 +1,11 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .views import ChatroomViewSet, MessageViewSet, UserRoomViewSet
+from .views import ChatroomViewSet, MessageViewSet, MessageReaderViewset, UserRoomViewSet
 from config.settings import API_VERSION
 
 router = DefaultRouter()
-router.register(prefix=API_VERSION+'messages', viewset=MessageViewSet)
+router.register(prefix=API_VERSION+'read_messages', viewset=MessageReaderViewset)
+router.register(prefix=API_VERSION+'write_messages', viewset=MessageViewSet)
 router.register(prefix=API_VERSION+'chatroom', viewset=ChatroomViewSet)
 router.register(prefix=API_VERSION+'user_rooms', viewset=UserRoomViewSet)
 
