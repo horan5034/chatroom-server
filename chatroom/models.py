@@ -12,7 +12,7 @@ class Chatroom(models.Model):
 class Message(models.Model):
     message = models.CharField(max_length=500, null=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='mesages', on_delete=models.DO_NOTHING)
-    date_added = models.DateField(auto_now_add=True)
+    date_added = models.DateTimeField(auto_now_add=True)
     room = models.ForeignKey(Chatroom, on_delete=models.DO_NOTHING)
 
 

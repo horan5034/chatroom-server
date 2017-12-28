@@ -115,6 +115,9 @@ REST_AUTH_SERIALIZERS = {
     
 }
 
+STRIPE_PUBLISHABLE = os.getenv('STRIPE_PUBLISHABLE', 'pk_test_I3u9O19d5x4QyY39NPdFS4Bl')
+STRIPE_SECRET = os.getenv('STRIPE_SECRET', 'sk_test_9X1yyeVBIDcFhTNtEs4C3HuS')
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
 
 AUTH_USER_MODEL = 'accounts.User'

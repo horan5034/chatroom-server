@@ -39,16 +39,12 @@ class UserRoomViewSet(viewsets.ModelViewSet):
 
     @detail_route(url_path='get_rooms')
     def get_room_by_user_id(self, request, pk=None):
-        user = User.objects.get(id=pk)
+        user_room_ids = UserRooms.objects.filter(user_id=pk).values_list('room_id', flat=True)
+        room_ids = Chatroom.objects.filter(id__in=user_room_ids)
+        rooms = Chatroom.objects.filter(id__in=room_ids)
 
-        if user is not None:
-            room_ids = UserRooms.objects.filter(user_id=user.id)
-            rooms = Chatroom.objects.filter(pk__in=room_ids)
-            
-            if rooms is None:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+        if rooms is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-            serialized_data = ChatroomSerializer(rooms, many=True)
-            return Response(serialized_data.data, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serialized_data = ChatroomSerializer(rooms, many=True)
+        return Response(serialized_data.data, status=status.HTTP_200_OK)

@@ -7,9 +7,13 @@ from django.utils import timezone
 from django.conf import settings
 
 # Create your models here.
-class UserSubscriptions(models.Model):
-    users = models.IntegerField()
-    Subscriptions = models.IntegerField()
+
+class Subscription(models.Model):
+    name = models.CharField(max_length=10)
+    cost = models.DecimalField(decimal_places=2, max_digits=4)
+
+    def __str__(self):
+        return self.name
 
 class AccountUserManager(UserManager):
     def _create_user(self, usermname, email, password,
@@ -36,7 +40,9 @@ class AccountUserManager(UserManager):
 class User(AbstractUser):
     phone_number = models.IntegerField(null=True, blank=True)
     is_subscribed = models.BooleanField(default=False)
-    user_subscription_id = models.ForeignKey(UserSubscriptions, on_delete=models.CASCADE, null=True)
+    stripe_id = models.CharField(max_length=40, default='')
+    subscription_end = models.DateTimeField(default=timezone.now)
+    subscriptions = models.ForeignKey(Subscription, on_delete=models.DO_NOTHING, null=True)
 
     objects = AccountUserManager()
 
@@ -44,11 +50,4 @@ class User(AbstractUser):
         return self.email
 
 
-class Subscription(models.Model):
-    name = models.CharField(max_length=10)
-    cost = models.DecimalField(decimal_places=2, max_digits=4)
-    user_subscription_id = models.ForeignKey(UserSubscriptions, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-    
+ 
