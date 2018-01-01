@@ -18,9 +18,6 @@ class Subscription(models.Model):
 class AccountUserManager(UserManager):
     def _create_user(self, usermname, email, password,
                      is_staff, is_superuser, **extra_fields):
-        """
-        Creates and saves a user with the given username, email and password
-        """
         now = timezone.now()
         if not email:
             raise ValueError('The given username must be set')
@@ -39,10 +36,13 @@ class AccountUserManager(UserManager):
 
 class User(AbstractUser):
     phone_number = models.IntegerField(null=True, blank=True)
+
     is_subscribed = models.BooleanField(default=False)
     stripe_id = models.CharField(max_length=40, default='')
     subscription_end = models.DateTimeField(default=timezone.now)
     subscriptions = models.ForeignKey(Subscription, on_delete=models.DO_NOTHING, null=True)
+    
+    profile_picture_path = models.CharField(max_length=1000, null=True)
 
     objects = AccountUserManager()
 

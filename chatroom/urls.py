@@ -1,16 +1,14 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .views import ChatroomViewSet, MessageViewSet, MessageReaderViewset, UserRoomViewSet
+from .views import ChatroomView, MessageView, UserRoomView
 from config.settings import API_VERSION
 
-router = DefaultRouter()
-router.register(prefix=API_VERSION+'read_messages', viewset=MessageReaderViewset)
-router.register(prefix=API_VERSION+'write_messages', viewset=MessageViewSet)
-router.register(prefix=API_VERSION+'chatroom', viewset=ChatroomViewSet)
-router.register(prefix=API_VERSION+'user_rooms', viewset=UserRoomViewSet)
-
-urlpatterns = router.urls
-
-# url(r''+API_VERSION + 'chatroom/(?P<pk>[0-9]+)/$', ChatroomView.as_view()),
-# url(r''+API_VERSION+'messages/(?P<room_id>[0-9]+)/$', MessageView.as_view()),
+urlpatterns = [
+    url(r'get_rooms/(?P<pk>[0-9]+)/$', ChatroomView.as_view()),
+    url(r'get_room/(?P<pk>[0-9]+)/$', ChatroomView.as_view()),
+    url(r'get_user_rooms/(?P<pk>[0-9]+)/$', UserRoomView.as_view()),
+    url(r'add_to_room/$', UserRoomView.as_view()),
+    url(r'get_room_messages/(?P<pk>[0-9]+)/$', MessageView.as_view()),
+    url(r'write_message/', MessageView.as_view()),
     
+]

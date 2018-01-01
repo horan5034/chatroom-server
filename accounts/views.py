@@ -1,75 +1,78 @@
-from rest_framework import viewsets, status
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
+from rest_framework.views import APIView
 from .models import User, Subscription
-from .serializers import UserSerializer, UserReaderSerializer, SubscriptionSerializer
+from chatroom.models import UserRooms
+from .serializers import UserSerializer, SubscriptionSerializer
 from django.conf import settings
-import stripe, datetime
+import stripe
+import datetime
 
 from django.contrib import messages, auth
 
 # Create your views here.
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for listing and retrieving users.
-    """
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-
-    # @detail_route(methods=['GET'], url_path='login')
-    # def login(self, request):
+class UserView(APIView):
     
-    #     user = auth.authenticate(email=request.POST.get('email'),
-    #                              password=request.POST.get('password'))
-    #     serialized_data = UserSerializer(user, many=False)
-    
-    #     if user is not None:
-    #         auth.login(request, user)
-    
-    #         return Response(serialized_data.data,
-    #                         status=status.HTTP_200_OK)
-    #     else:
-    #         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-    @detail_route(methods=['post'])
-    def set_password(self, request, pk=None):
-        user = self.get_object()
-        serializer = PasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            user.set_password(serializer.data['password'])
-            user.save()
+    def get(self, request, pk=None):
+        if pk is None:
+            users = User.objects.all()
+            if users is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
             
-            return Response({'status': 'password set'})
+            serializer = UserSerializer(users, many=True)
+            serialized_data = serializer.data
+                
+            return Response(serialized_data, status=status.HTTP_200_OK)
         else:
+            user = User.objects.get(id=pk)
+            if user is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = UserSerializer(user, many=False)
+            serialized_data = serializer.data
+            
+            return Response(serialized_data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, pk):
+        user = User.objects.get(id=pk)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer.save()
+        return Response(serializer.data)
 
-    @detail_route(methods=['PUT','POST'], url_path='subscribe')
-    def create_subscription(self, request, pk=None):
-        stripe.api_key = settings.STRIPE_SECRET
+
+    def put(self, request):
+        user = request.data['user']
+
+        stripe.api_key=settings.STRIPE_SECRET
         customer = stripe.Customer.create(
-                    email=request.data['email'],
+                    email=user['email'],
                     card=request.data['stripe_token'],
                     plan='STANDARD_CHAT',
                 )
         if customer:
-            user = self.get_object()
-            serializer = UserSerializer(data=request.data)
-            
-            user.is_subscribed = True
-            user.subscription_end = datetime.datetime.now() + datetime.timedelta(days=30)
-            user.stripe_id = request.data['stripe_token']
-            user.save()
-            return Response(status=status.HTTP_200_OK)
+            serializer = UserSerializer(user, data=request.data)
 
-class UserReaderViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for listing and retrieving users.
-    """
-    serializer_class = UserReaderSerializer
-    queryset = User.objects.all()
+            if not serializer.is_valid():
+                return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(serializer.data, 
+                            status=status.HTTP_201_CREATED)
+   
 
-class SubscriptionViewSet(viewsets.ModelViewSet):
-    serializer_class = SubscriptionSerializer
-    queryset = Subscription.objects.all()
+class SubscriptionView(APIView):
+    def get(selfself, request):
+        subscriptions = Subscription.objects.all()
+        serializer = SubscriptionSerializer(subscriptions, many=True)
+        serialized_data = serializer.data
+
+        return Response(serialized_data, status=status.HTTP_200_OK)
+
+    

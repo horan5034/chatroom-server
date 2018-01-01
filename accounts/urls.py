@@ -1,9 +1,11 @@
-from rest_framework.routers import DefaultRouter
-from accounts.views import UserViewSet, SubscriptionViewSet
+from accounts.views import UserView, SubscriptionView
 from config.settings import API_VERSION
+from django.conf.urls import url
 
-router = DefaultRouter()
-router.register(prefix=API_VERSION+'user', viewset=UserViewSet)
-router.register(prefix=API_VERSION+'subscription', viewset=SubscriptionViewSet)
+urlpatterns = [
+    url(r'users/$', UserView.as_view()),
+    url(r'user/(?P<pk>[0-9]+)/$', UserView.as_view()),
+    url(r'update/(?P<pk>[0-9]+)/$', UserView.as_view()),
+    url(r'subscription/$', UserView.as_view()),
 
-urlpatterns = router.urls
+]
