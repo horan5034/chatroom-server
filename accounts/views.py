@@ -57,7 +57,7 @@ class UserView(APIView):
                     plan='STANDARD_CHAT',
                 )
         if customer:
-            serializer = UserSerializer(user, data=request.data)
+            serializer = UserSerializer(user, data=request.data, partial=True)
 
             if not serializer.is_valid():
                 return Response(serializer.errors,

@@ -40,10 +40,17 @@ class ChatroomView(APIView):
 
 class MessageView(APIView):
     def get(self, request, pk=None):
+        try:
+            limit = int(request.query_params['limit'])
+            offset = int(request.query_params['offset'])        
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST) 
+        
         if pk is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            messages = Message.objects.filter(room_id=pk)
+            messages = Message.objects.filter(room_id=pk)\
+                .order_by('-id')[offset:offset+limit]
             serializer = MessageReaderSerializer(messages, many=True)
             serialized_data = serializer.data
             
