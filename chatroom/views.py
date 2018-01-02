@@ -1,7 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route, list_route
 from .serializers import ChatroomSerializer, MessageSerializer, MessageReaderSerializer, UserRoomSerializer
 from .models import Chatroom, Message, UserRooms
 from accounts.models import User
@@ -24,18 +23,18 @@ class ChatroomView(APIView):
             return Response(serialized_data, status=status.HTTP_200_OK)
 
 
-    @detail_route()
-    def get_messages(self, request, pk=None):
-        room = self.get_object()
+    def post(self, request):
+        serializer = ChatroomSerializer(data=request.data)
 
-        if room is not None:
-            messages = Message.objects.filter(room_id=room.id)
-            serialized_data = MessageReaderSerializer(messages, many=True)
+        if serializer.is_valid():
+            serializer.save()
 
-            return Response(serialized_data.data, 
-                            status=status.HTTP_200_OK) 
-        else: 
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(serializer.data, 
+                            status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors,
+                        status=status.HTTP_404_NOT_FOUND)
+            
 
 
 class MessageView(APIView):
