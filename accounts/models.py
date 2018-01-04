@@ -16,14 +16,14 @@ class Subscription(models.Model):
         return self.name
 
 class AccountUserManager(UserManager):
-    def _create_user(self, usermname, email, password,
+    def _create_user(self, username, email, password,
                      is_staff, is_superuser, **extra_fields):
         now = timezone.now()
         if not email:
             raise ValueError('The given username must be set')
 
         email = self.normalize_email(email)
-        user = self.model(username=email, email=email,
+        user = self.model(username=username, email=email,
                           is_staff=is_staff, is_active=True,
                           is_superuser=is_superuser, date_joined=now,
                           **extra_fields)
@@ -43,6 +43,8 @@ class User(AbstractUser):
     subscriptions = models.ForeignKey(Subscription, on_delete=models.DO_NOTHING, null=True)
     
     profile_picture_path = models.CharField(max_length=1000, null=True)
+    room_limit = models.IntegerField(null=False, default=10)
+    rooms_joined = models.IntegerField(null=False, default=1)
 
     objects = AccountUserManager()
 

@@ -7,6 +7,7 @@ from django.conf import settings
 class Chatroom(models.Model):
     name = models.CharField(max_length=50, null=False)
     tag = models.CharField(max_length=20, null=True)
+    room_type = models.CharField(max_length=10, null=False, default="public")
 
 
 class Message(models.Model):
