@@ -5,6 +5,7 @@ from config.settings import API_VERSION
 
 urlpatterns = [
     url(r'get_rooms/(?P<pk>[0-9]+)/$', ChatroomView.as_view()),
+    url(r'get_rooms/', ChatroomView.as_view()),
     url(r'get_room/(?P<pk>[0-9]+)/$', ChatroomView.as_view()),
     url(r'add_room/$', ChatroomView.as_view()),
     url(r'get_user_rooms/(?P<pk>[0-9]+)/$', UserRoomView.as_view()),

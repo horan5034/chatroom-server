@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,9 +11,15 @@ from accounts.models import User
 class ChatroomView(APIView):
     def get(self, request, pk=None):
         if pk is None:
-            rooms = Chatroom.objects.all()
-            serializer = ChatroomSerializer(rooms, many=True)
-            serialized_data = serializer.data
+            if request.query_params is not None:
+                name = request.query_params['name'] if request.query_params['name'] is not None else None
+                tag = request.query_params['tag'] if request.query_params['tag'] is not None else None
+
+                rooms = Chatroom.objects.filter(Q(name__startswith=name) | Q(tag__icontains=tag))
+                serializer = ChatroomSerializer(rooms, many=True)
+                serialized_data = serializer.data
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             
             return Response(serialized_data, status=status.HTTP_200_OK)
         else:

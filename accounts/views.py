@@ -1,9 +1,10 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_auth.registration.views import RegisterView
 from .models import User, Subscription
 from chatroom.models import UserRooms
-from .serializers import UserSerializer, SubscriptionSerializer
+from .serializers import UserSerializer, SubscriptionSerializer, RegisterUserSerializer
 from django.conf import settings
 import stripe
 import datetime
@@ -75,4 +76,6 @@ class SubscriptionView(APIView):
 
         return Response(serialized_data, status=status.HTTP_200_OK)
 
-    
+
+class NameRegistrationView(RegisterView):
+    serializer_class = RegisterUserSerializer

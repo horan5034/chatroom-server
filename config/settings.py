@@ -143,3 +143,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGOUT_ON_PASSWORD_CHANGE = False
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+        'REGISTER_SERIALIZER': 'accounts.serializers.RegisterUserSerializer',
+}
