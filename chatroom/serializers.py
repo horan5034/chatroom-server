@@ -2,7 +2,6 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from .models import Chatroom, Message, UserRooms
 from accounts.serializers import UserSerializer
-from accounts.models import User
 
 class ChatroomSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,11 +22,12 @@ class MessageReaderSerializer(serializers.ModelSerializer):
         model = Message
         fields = '__all__'
 
+
 class UserRoomSerializer(serializers.ModelSerializer):
     room_id = serializers.StringRelatedField(many=False)
     user_id = serializers.StringRelatedField(many=False)
 
-    class Meta: 
+    class Meta:
         model = UserRooms
         fields = '__all__'
 

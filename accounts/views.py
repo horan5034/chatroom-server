@@ -13,34 +13,34 @@ from django.contrib import messages, auth
 
 # Create your views here.
 class UserView(APIView):
-    
+
     def get(self, request, pk=None):
         if pk is None:
             users = User.objects.all()
-            if users is None:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            
             serializer = UserSerializer(users, many=True)
+
+            if users is None and not serializer.is_valid():
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
             serialized_data = serializer.data
-                
+
             return Response(serialized_data, status=status.HTTP_200_OK)
         else:
-            user = User.objects.get(id=pk)
-            if user is None:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            
-            serializer = UserSerializer(user, many=False)
+            user = User.objects.get(pk=pk)
+            serializer = UserSerializer(user)
+
+            if user is None and not serializer.is_valid():
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
             serialized_data = serializer.data
-            
+
             return Response(serialized_data, status=status.HTTP_200_OK)
     
     def patch(self, request, pk):
         user = User.objects.get(id=pk)
-        if user is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        
         serializer = UserSerializer(user, data=request.data, partial=True)
-        if not serializer.is_valid():
+
+        if user is None and not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         
@@ -57,16 +57,32 @@ class UserView(APIView):
                     card=request.data['stripe_token'],
                     plan='STANDARD_CHAT',
                 )
+
         if customer:
             serializer = UserSerializer(user, data=request.data, partial=True)
 
             if not serializer.is_valid():
                 return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
             serializer.save()
             return Response(serializer.data, 
                             status=status.HTTP_201_CREATED)
-   
+
+    def post(self, request, pk = None):
+        user = User.objects.get(id=pk)
+
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        stripe.api_key=settings.STRIPE_SECRET
+        customer = stripe.Customer.retrieve(user.stripe_id)
+        customer.cancel_subscription(at_period_end=True)
+
+        user.is_subscibed = False
+        user.save()
+
+        return Response(status=status.HTTP_200_OK)
 
 class SubscriptionView(APIView):
     def get(selfself, request):
