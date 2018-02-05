@@ -33,7 +33,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8081',
     'http://127.0.0.1:8081',
-    'https://chatrooms-server.herokuapp.com/'
+    'https://chatroom-client.herokuapp.com/'
 )
 
 # SECURE_SSL_REDIRECT = True
@@ -42,7 +42,7 @@ CORS_ORIGIN_WHITELIST = (
 ALLOWED_HOSTS = [
     "127.0.0.1", 
     "localhost", 
-    'https://chatrooms-server.herokuapp.com/'
+    'https://chatroom-client.herokuapp.com/'
 ]
 
 # Application definition
