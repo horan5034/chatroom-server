@@ -25,6 +25,8 @@ SECRET_KEY = '9dtg=$q!l^zo2ms3t@b4n0v!$@%m#jce0p&)bx_g!%*$@wi%-r'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
@@ -59,6 +61,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_docs',
     'rest_auth',
     'allauth',
     'allauth.account',
