@@ -41,8 +41,8 @@ CORS_ORIGIN_WHITELIST = (
 ALLOWED_HOSTS = [
     "127.0.0.1", 
     "localhost", 
-    'https://chatrooms-server.herokuapp.com',
-    'https://chatroom-client.herokuapp.com'
+    'chatrooms-server.herokuapp.com',
+    'chatroom-client.herokuapp.com'
 ]
 
 # Application definition
