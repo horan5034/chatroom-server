@@ -17,6 +17,10 @@ class UserView(APIView):
     def get(self, request, pk=None):
         if pk is None:
             users = User.objects.all()
+
+            if users is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
             serializer = UserSerializer(users, many=True)
 
             if users is None and not serializer.is_valid():
@@ -26,15 +30,16 @@ class UserView(APIView):
 
             return Response(serialized_data, status=status.HTTP_200_OK)
         else:
-            user = User.objects.get(pk=pk)
-            serializer = UserSerializer(user)
+            user = User.objects.get(id=pk)
+            if User is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
-            if user is None and not serializer.is_valid():
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
+            serializer = UserSerializer(user)
             serialized_data = serializer.data
 
-            return Response(serialized_data, status=status.HTTP_200_OK)
+            return Response(serialized_data,
+                            status=status.HTTP_200_OK)
+
     
     def patch(self, request, pk):
         user = User.objects.get(id=pk)
