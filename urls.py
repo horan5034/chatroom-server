@@ -9,8 +9,8 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^'+API_VERSION+'admin/', admin.site.urls),
-    url(r'^'+API_VERSION+'chatroom/', include('chatroom.urls')),
-    url(r'^'+API_VERSION+'account/', include('accounts.urls')),
+    url(r'^'+API_VERSION+'rooms/', include('chatroom.urls')),
+    url(r'^'+API_VERSION+'users/', include('accounts.urls')),
     url(r'^'+API_VERSION+'rest-auth/', include('rest_auth.urls')),
     url(r'^'+API_VERSION+'rest-auth/registration/', include('rest_auth.registration.urls')),
 

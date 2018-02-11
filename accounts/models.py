@@ -43,10 +43,14 @@ class User(AbstractUser):
     subscriptions = models.ForeignKey(Subscription, on_delete=models.DO_NOTHING, null=True)
     
     profile_picture_path = models.CharField(max_length=1000, null=True)
+    
     room_limit = models.IntegerField(null=False, default=10)
-    rooms_joined = models.IntegerField(null=False, default=1)
+    rooms_joined = models.IntegerField(null=False)
+    
     display_name = models.CharField(null=False, max_length=15, default="Change Me")
     objects = AccountUserManager()
+
+    socket_id = models.CharField(max_length=50, null=True)
 
     def __str__(self):
         return self.email

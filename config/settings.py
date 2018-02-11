@@ -92,6 +92,13 @@ TEMPLATES = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
@@ -143,6 +150,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGOUT_ON_PASSWORD_CHANGE = False
+OLD_PASSWORD_FIELD_ENABLED = True
 
 REST_AUTH_REGISTER_SERIALIZERS = {
         'REGISTER_SERIALIZER': 'accounts.serializers.RegisterUserSerializer',
