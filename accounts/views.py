@@ -42,10 +42,13 @@ class UserView(APIView):
 
     
     def patch(self, request, pk):
+        if pk is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.get(id=pk)
         serializer = UserSerializer(user, data=request.data, partial=True)
 
-        if user is None and not serializer.is_valid():
+        if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         
@@ -90,7 +93,7 @@ class UserView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 class SubscriptionView(APIView):
-    def get(selfself, request):
+    def get(self, request):
         subscriptions = Subscription.objects.all()
         serializer = SubscriptionSerializer(subscriptions, many=True)
         serialized_data = serializer.data
