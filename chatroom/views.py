@@ -21,9 +21,15 @@ class ChatroomView(APIView):
             searchable_rooms = Chatroom.objects.filter(Q(name__icontains=search_term) |
                                                        Q(tag__icontains=search_term))
 
+<<<<<<< HEAD
             filtered_rooms = UserRooms.objects.filter(room_id__in=searchable_rooms) \
                 .exclude(user_id=user_id) \
                 .distinct() \
+=======
+            filtered_rooms = UserRooms.objects.filter(room_id__in=searchable_rooms)\
+                .exclude(user_id=user_id)\
+                .distinct()\
+>>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
                 .values_list('room_id', flat=True)
 
             results = Chatroom.objects.filter(id__in=filtered_rooms)
@@ -40,6 +46,7 @@ class ChatroomView(APIView):
             return Response(serialized_data, status=status.HTTP_200_OK)
 
     def post(self, request):
+<<<<<<< HEAD
             new_room = Chatroom.objects.create(room_type=request.data['type'], tag=request.data['tag'],
                                                name=request.data['name'])
 
@@ -51,6 +58,32 @@ class ChatroomView(APIView):
 
             return Response(new_room,
                             status=status.HTTP_201_CREATED)
+=======
+        if 'invitee_id' not in request.data:
+            new_room = Chatroom.objects.create(room_type=request.data['type'], tag=request.data['tag'],
+                                               name=request.data['name'])
+
+            UserRooms.objects.create(room_id=new_room.id, user_id=request.data['user_id'])
+
+            user = User.objects.get(pk=request.data['user_id'])
+            user.rooms_joined += 1
+            user.save()
+
+            return Response(new_room,
+                            status=status.HTTP_201_CREATED)
+        else:
+            serializer = ChatroomSerializer(data=request.data, partial=True)
+
+            if not serializer.is_valid():
+                return Response(serializer.errors,
+                                status=status.HTTP_404_NOT_FOUND)
+
+            serializer.save()
+            serialized_data = serializer.data
+
+            return Response(serialized_data, status=status.HTTP_200_OK)
+
+>>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
         
 
 class MessageView(APIView):
@@ -67,12 +100,17 @@ class MessageView(APIView):
         else:
             messages = Message.objects.filter(room_id=pk) \
                            .order_by('-id')[offset:offset + limit]
+
             serializer = MessageReaderSerializer(messages, many=True)
             serialized_data = serializer.data
 
             return Response(serialized_data, status=status.HTTP_200_OK)
 
+<<<<<<< HEAD
     # write_message
+=======
+
+>>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
     def post(self, request):
         serializer = MessageSerializer(data=request.data)
 
@@ -87,6 +125,7 @@ class MessageView(APIView):
 
 class UserRoomView(APIView):
     def get(self, request, pk=None):
+<<<<<<< HEAD
         if pk is not None:
             user_room_ids = UserRooms.objects.filter(user=pk).values_list('room_id', flat=True)
 
@@ -98,6 +137,23 @@ class UserRoomView(APIView):
                 return Response(status=status.HTTP_200_OK)
 
             serializer = ChatroomSerializer(rooms, many=True)
+=======
+        if pk is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user_room_ids = UserRooms.objects.filter(host_id=pk)\
+                .values_list('room_id', flat=True)
+            if user_room_ids is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            rooms = Chatroom.objects.filter(id__in=user_room_ids)
+            if rooms is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            serializer = ChatroomSerializer(rooms, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+>>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -112,7 +168,10 @@ class UserRoomView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(pk=request.data['user'])
+<<<<<<< HEAD
         user.rooms_joined += 1
+=======
+>>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
         user.save()
 
         serializer.save()
