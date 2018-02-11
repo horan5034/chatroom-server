@@ -17,12 +17,10 @@ class UserView(APIView):
     def get(self, request, pk=None):
         if pk is None:
             users = User.objects.all()
-<<<<<<< HEAD
+
             if users is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-=======
->>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
             serializer = UserSerializer(users, many=True)
 
             if users is None and not serializer.is_valid():
@@ -32,7 +30,6 @@ class UserView(APIView):
 
             return Response(serialized_data, status=status.HTTP_200_OK)
         else:
-<<<<<<< HEAD
             user = User.objects.get(id=pk)
             if User is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -43,17 +40,6 @@ class UserView(APIView):
             return Response(serialized_data,
                             status=status.HTTP_200_OK)
 
-=======
-            user = User.objects.get(pk=pk)
-            serializer = UserSerializer(user)
-
-            if user is None and not serializer.is_valid():
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-            serialized_data = serializer.data
-
-            return Response(serialized_data, status=status.HTTP_200_OK)
->>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
     
     def patch(self, request, pk):
         user = User.objects.get(id=pk)
@@ -90,15 +76,10 @@ class UserView(APIView):
 
     def post(self, request, pk = None):
         user = User.objects.get(id=pk)
-<<<<<<< HEAD
-        if user is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-=======
 
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
->>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
         stripe.api_key=settings.STRIPE_SECRET
         customer = stripe.Customer.retrieve(user.stripe_id)
         customer.cancel_subscription(at_period_end=True)

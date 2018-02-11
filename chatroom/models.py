@@ -11,12 +11,7 @@ class Chatroom(models.Model):
 
 
 class UserRooms(models.Model):
-<<<<<<< HEAD
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user", on_delete=models.DO_NOTHING, null=False)
-=======
-    host = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user", on_delete=models.DO_NOTHING, null=False)
-    invitee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, null=True)
->>>>>>> 22ff81903a810015e642b05b5a54a0fadd16e6b2
     room = models.ForeignKey(Chatroom, on_delete=models.DO_NOTHING)
 
 
