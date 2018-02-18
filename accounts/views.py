@@ -63,20 +63,23 @@ class UserView(APIView):
         if user is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        stripe.api_key=settings.STRIPE_SECRET
-        customer = stripe.Customer.create(
-                    email=user_data['email'],
+        stripe.api_key = settings.STRIPE_SECRET
+        customer = stripe.Charge.create(
+                    amount=1000,
+                    currency="GBP",
+                    description="Chatrooms Standard Payment",
                     card=request.data['stripe_token'],
-                    plan='STANDARD_CHAT',
                 )
 
-        if customer:
+        if customer.paid:
             user.is_subscribed = True
-            user.stripe_id = user_data['stripe_id']
-            user.subscription_end = datetime.datetime.now()
+            user.stripe_id = customer['id']
 
             user.save()
-            return Response(status=status.HTTP_201_CREATED)
+
+            serializer = UserSerializer(user)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -88,12 +91,16 @@ class UserView(APIView):
 
         stripe.api_key = settings.STRIPE_SECRET
         customer = stripe.Customer.retrieve(user.stripe_id)
-        customer.cancel_subscription(at_period_end=True)
 
-        user.is_subscribed = False
-        user.save()
+        if customer is not None:
+            customer.cancel_subscription(at_period_end=True)
 
-        return Response(status=status.HTTP_200_OK)
+            user.is_subscribed = False
+            user.save()
+
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class SubscriptionView(APIView):
     def get(self, request):
