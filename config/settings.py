@@ -115,7 +115,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-    default': dj_database_url.config('CLEARDB_DATABASE_URL')
+    'default': dj_database_url.config('CLEARDB_DATABASE_URL')
 
 #  'default': {
 #          'ENGINE': 'django.db.backends.sqlite3',
