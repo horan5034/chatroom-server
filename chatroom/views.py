@@ -42,7 +42,7 @@ class ChatroomView(APIView):
 
     def post(self, request):
         new_room = Chatroom.objects.create(room_type=request.data['type'], tag=request.data['tag'],
-                                            name=request.data['name'])
+                                           name=request.data['name'])
 
         UserRooms.objects.create(room_id=new_room.id, user_id=request.data['user_id'])
 
@@ -50,7 +50,10 @@ class ChatroomView(APIView):
         user.rooms_joined += 1
         user.save()
 
-        return Response(new_room,
+        serializer = ChatroomSerializer(new_room)
+        serialized_data = serializer.data
+
+        return Response(serialized_data,
                         status=status.HTTP_201_CREATED)
 
         

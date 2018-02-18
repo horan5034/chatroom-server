@@ -48,46 +48,49 @@ class UserView(APIView):
         user = User.objects.get(id=pk)
         serializer = UserSerializer(user, data=request.data, partial=True)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer.save()
-        return Response(serializer.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
     def put(self, request):
-        user = request.data['user']
+        user_data = request.data['user']
+        user = User.objects.get(email=user_data['email'])
+
+        if user is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         stripe.api_key=settings.STRIPE_SECRET
         customer = stripe.Customer.create(
-                    email=user['email'],
+                    email=user_data['email'],
                     card=request.data['stripe_token'],
                     plan='STANDARD_CHAT',
                 )
 
         if customer:
-            serializer = UserSerializer(user, data=request.data, partial=True)
+            user.is_subscribed = True
+            user.stripe_id = user_data['stripe_id']
+            user.subscription_end = datetime.datetime.now()
 
-            if not serializer.is_valid():
-                return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            user.save()
+            return Response(status=status.HTTP_201_CREATED)
 
-            serializer.save()
-            return Response(serializer.data, 
-                            status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, pk = None):
+    def post(self, request, pk=None):
         user = User.objects.get(id=pk)
 
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        stripe.api_key=settings.STRIPE_SECRET
+        stripe.api_key = settings.STRIPE_SECRET
         customer = stripe.Customer.retrieve(user.stripe_id)
         customer.cancel_subscription(at_period_end=True)
 
-        user.is_subscibed = False
+        user.is_subscribed = False
         user.save()
 
         return Response(status=status.HTTP_200_OK)

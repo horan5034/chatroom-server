@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^'+API_VERSION+'users/', include('accounts.urls')),
     url(r'^'+API_VERSION+'rest-auth/', include('rest_auth.urls')),
     url(r'^'+API_VERSION+'rest-auth/registration/', include('rest_auth.registration.urls')),
+    url(r'^', include('django.contrib.auth.urls')),
 
 ]
 
